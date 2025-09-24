@@ -1,0 +1,7 @@
+{
+  "name": "Book Identifier AI",
+  "description": "An AI-powered web application that identifies books from an uploaded image, extracts details like title, author, publication year, and genre, and presents them in a table.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

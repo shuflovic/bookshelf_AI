@@ -1,0 +1,30 @@
+
+export interface Book {
+  title: string;
+  author: string;
+  publicationYear: number | string;
+  genre: string;
+}
+
+export interface GeminiBookResponse {
+    title: string;
+    author: string;
+    publicationYear: number | string;
+    authorGenre: string;
+}
+
+export enum UploadState {
+  IDLE,
+  TAKING_PICTURE,
+  PROCESSING,
+  RESULTS,
+  ERROR,
+}
+
+export interface AppSettings {
+  apiKey?: string;
+  supabaseUrl?: string;
+  supabaseKey?: string;
+}
+
+export type AppView = 'settings' | 'upload' | 'library';
