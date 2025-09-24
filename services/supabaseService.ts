@@ -1,22 +1,20 @@
-
 import { createClient } from '@supabase/supabase-js';
-import { Book } from '../types';
-import { convertToCSV } from '../utils/csvHelper';
 
-export const uploadBooksToSupabase = async (books: Book[], supabaseUrl: string, supabaseKey: string): Promise<void> => {
+export const uploadCsvToSupabase = async (csvData: string, fileName: string, supabaseUrl: string, supabaseKey: string): Promise<void> => {
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Supabase URL or Key not provided.");
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const csvData = convertToCSV(books);
-  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-  const fileName = `book-collection-${Date.now()}.csv`;
-  const bucketName = 'library'; // As specified by user
+  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-t;' });
+  const bucketName = 'library';
 
+  // Use upsert to create the file if it doesn't exist, or overwrite it if it does.
   const { data, error } = await supabase.storage
     .from(bucketName)
-    .upload(fileName, blob);
+    .upload(fileName, blob, {
+        upsert: true,
+    });
 
   if (error) {
     console.error("Supabase upload error:", error);

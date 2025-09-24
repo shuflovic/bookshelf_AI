@@ -6,7 +6,7 @@ export const parseCSV = (csvText: string): Book[] => {
 
     // Remove BOM and clean headers
     const headers = lines[0].replace(/^\uFEFF/, '').split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    
+
     // Find column indices robustly
     const findIndex = (possibleNames: string[]) => {
         for (const name of possibleNames) {
@@ -32,7 +32,7 @@ export const parseCSV = (csvText: string): Book[] => {
     return lines.slice(1).map((line): Book | null => {
         if (!line.trim()) return null;
         // Basic CSV parsing, may not handle all edge cases like commas within quoted fields
-        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, '').trim());
         return {
             title: values[titleIndex] || 'Unknown',
             author: values[authorIndex] || 'Unknown',
@@ -44,8 +44,26 @@ export const parseCSV = (csvText: string): Book[] => {
 
 export const convertToCSV = (data: Book[]): string => {
     const headers = "Title,Author,First Published Year,Genre";
+    if (!data || data.length === 0) {
+        return headers;
+    }
     const rows = data.map(book => 
       `"${String(book.title || '').replace(/"/g, '""')}","${String(book.author || '').replace(/"/g, '""')}",${book.publicationYear},"${String(book.genre || '').replace(/"/g, '""')}"`
     );
     return [headers, ...rows].join('\n');
+};
+
+export const mergeBooks = (existingBooks: Book[], newBooks: Book[]): { mergedBooks: Book[], addedCount: number } => {
+    const bookExists = (book: Book, bookList: Book[]) => 
+        bookList.some(b => 
+            b.title.toLowerCase().trim() === book.title.toLowerCase().trim() && 
+            b.author.toLowerCase().trim() === book.author.toLowerCase().trim()
+        );
+
+    const uniqueNewBooks = newBooks.filter(newBook => !bookExists(newBook, existingBooks));
+
+    return {
+        mergedBooks: [...existingBooks, ...uniqueNewBooks],
+        addedCount: uniqueNewBooks.length
+    };
 };

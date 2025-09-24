@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Book, UploadState, AppSettings } from '../types';
 import { identifyBooksFromImage } from '../services/geminiService';
@@ -18,6 +17,7 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [lastSavedCollection, setLastSavedCollection] = useState<string | null>(null);
 
   const handleImageUpload = useCallback(async (file: File) => {
     if (!settings?.apiKey) {
@@ -56,7 +56,7 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
       setUploadState(UploadState.ERROR);
     };
   }, [settings]);
-  
+
   const handleTextFileUpload = useCallback(async (file: File) => {
     setUploadState(UploadState.PROCESSING);
     setError(null);
@@ -119,7 +119,14 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
     case UploadState.PROCESSING:
       return <Spinner message="Processing your file..." />;
     case UploadState.RESULTS:
-      return <ResultsDisplay imageSrc={uploadedImage} books={books} onReset={handleReset} settings={settings} />;
+      return <ResultsDisplay
+                imageSrc={uploadedImage}
+                books={books}
+                onReset={handleReset}
+                settings={settings}
+                lastSavedCollection={lastSavedCollection}
+                onSaveSuccess={setLastSavedCollection}
+             />;
     case UploadState.ERROR:
       return <ErrorDisplay message={error || "An unknown error occurred."} onReset={handleReset} />;
     default:
