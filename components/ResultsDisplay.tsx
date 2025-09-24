@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Book, AppSettings } from '../types';
 import ActionButton from './ActionButton';
@@ -15,7 +14,7 @@ interface ResultsDisplayProps {
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onReset, settings }) => {
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [uploadMessage, setUploadMessage] = useState<string>('');
-  
+
   const handleDownload = () => {
     const csvData = convertToCSV(books);
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -49,7 +48,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
       console.error(err);
     }
   };
-  
+
   const showSupabaseButton = settings?.supabaseUrl && settings?.supabaseKey;
 
   return (
@@ -69,7 +68,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
           <p className="font-bold">Success!</p>
           <p className="text-sm">Successfully identified and processed {books.length} book(s).</p>
         </div>
-        
+
         <div className="overflow-x-auto bg-gray-900/60 rounded-lg border border-gray-700">
           <table className="min-w-full text-sm text-left text-gray-300">
             <thead className="text-xs text-gray-200 uppercase bg-gray-700/50">
@@ -92,15 +91,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
             </tbody>
           </table>
         </div>
-        
+
         <div className="mt-6 flex flex-col sm:flex-row gap-4">
           <ActionButton onClick={handleDownload} text="Download CSV" primary={false} />
           {showSupabaseButton && (
             <ActionButton
               onClick={handleUploadToSupabase}
-              text={uploadStatus === 'uploading' ? 'Uploading...' : 'Upload to Supabase'}
-              primary={false}
+              text="Upload to Supabase Library"
               disabled={uploadStatus === 'uploading'}
+              primary={false}
             />
           )}
           <ActionButton onClick={onReset} text="Add More Books" primary={true} />
