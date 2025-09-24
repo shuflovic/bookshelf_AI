@@ -41,6 +41,13 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
         loadFiles();
     }, [loadFiles]);
 
+    // Auto-activate View All when files are loaded
+    useEffect(() => {
+        if (files.length > 0 && !selectedFile && !isViewAllActive && !loading) {
+            handleViewAll();
+        }
+    }, [files, selectedFile, isViewAllActive, loading]);
+
     const handleFileSelect = async (file: FileObject) => {
         if (!settings?.supabaseUrl || !settings?.supabaseKey) return;
         setLoading('content');
