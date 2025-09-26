@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Book, GeminiBookResponse } from '../types';
 
+
 const bookSchema = {
   type: Type.OBJECT,
   properties: {
