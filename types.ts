@@ -11,7 +11,7 @@ export interface GeminiBookResponse {
     title: string;
     author: string;
     publicationYear: number | string;
-    authorGenre: string;
+    genre: string;
     description: string;
 }
 
@@ -24,6 +24,7 @@ export enum UploadState {
 }
 
 export interface AppSettings {
+  apiKey?: string;
   supabaseUrl?: string;
   supabaseKey?: string;
 }
