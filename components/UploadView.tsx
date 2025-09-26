@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Book, UploadState, AppSettings } from '../types';
 import { identifyBooksFromImage } from '../services/geminiService';
@@ -9,7 +10,7 @@ import ErrorDisplay from './ErrorDisplay';
 import CameraCapture from './CameraCapture';
 
 interface UploadViewProps {
-    settings: AppSettings | null;
+    settings: AppSettings;
 }
 
 const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
@@ -20,12 +21,12 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
   const [lastSavedCollection, setLastSavedCollection] = useState<string | null>(null);
 
   const handleImageUpload = useCallback(async (file: File) => {
-    if (!settings?.apiKey) {
-      setError("Google Gemini API Key is not configured. Please go to Settings.");
+    if (!settings.apiKey) {
+      setError("Gemini API Key is not configured. Please add it in the Settings page.");
       setUploadState(UploadState.ERROR);
       return;
     }
-
+    
     setUploadState(UploadState.PROCESSING);
     setError(null);
     setBooks([]);
@@ -37,7 +38,7 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
       setUploadedImage(reader.result as string);
 
       try {
-        const identifiedBooks = await identifyBooksFromImage(base64Image, file.type, settings.apiKey);
+        const identifiedBooks = await identifyBooksFromImage(base64Image, file.type, settings.apiKey!);
         if (identifiedBooks && identifiedBooks.length > 0) {
           setBooks(identifiedBooks);
           setUploadState(UploadState.RESULTS);
@@ -47,7 +48,7 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
         }
       } catch (err) {
         console.error("Error identifying books:", err);
-        setError("An error occurred while analyzing the image. Please check your API key and try again.");
+        setError(err instanceof Error ? err.message : "An error occurred while analyzing the image. Please try again.");
         setUploadState(UploadState.ERROR);
       }
     };
@@ -55,8 +56,8 @@ const UploadView: React.FC<UploadViewProps> = ({ settings }) => {
       setError("Failed to read the uploaded image file.");
       setUploadState(UploadState.ERROR);
     };
-  }, [settings]);
-
+  }, [settings.apiKey]);
+  
   const handleTextFileUpload = useCallback(async (file: File) => {
     setUploadState(UploadState.PROCESSING);
     setError(null);
