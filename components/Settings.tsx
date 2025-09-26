@@ -13,16 +13,12 @@ const Settings: React.FC<SettingsProps> = ({ initialSettings, onSave }) => {
   const [supabaseUrl, setSupabaseUrl] = useState(initialSettings.supabaseUrl || '');
   const [supabaseKey, setSupabaseKey] = useState(initialSettings.supabaseKey || '');
 
-  const isInitialSetup = !initialSettings.apiKey;
-
   const handleSave = () => {
-    if (apiKey.trim()) {
-      onSave({
-        apiKey: apiKey.trim(),
-        supabaseUrl: supabaseUrl.trim() || undefined,
-        supabaseKey: supabaseKey.trim() || undefined
-      });
-    }
+    onSave({
+      apiKey: apiKey.trim() || undefined,
+      supabaseUrl: supabaseUrl.trim() || undefined,
+      supabaseKey: supabaseKey.trim() || undefined
+    });
   };
 
   return (
@@ -32,14 +28,20 @@ const Settings: React.FC<SettingsProps> = ({ initialSettings, onSave }) => {
                 Configuration
             </h1>
             <p className="mt-2 text-lg text-gray-400">
-                {isInitialSetup ? 'Welcome! Please enter your API keys to get started.' : 'Update your configuration settings.'}
+                Configure settings for the application.
             </p>
         </header>
 
         <div className="space-y-6">
-            <div>
+             <div>
+                <h2 className="text-lg font-semibold text-gray-200">Google Gemini API Key (Required)</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                    Enter your Google Gemini API key. For security, you must create a key that is restricted to this website's URL. See the README for instructions.
+                </p>
+            </div>
+             <div>
                 <label htmlFor="apiKey" className="block text-sm font-medium text-gray-300 mb-2">
-                    Google Gemini API Key <span className="text-red-500">*</span>
+                    Gemini API Key
                 </label>
                 <input
                     type="password"
@@ -47,10 +49,8 @@ const Settings: React.FC<SettingsProps> = ({ initialSettings, onSave }) => {
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your Gemini API Key"
-                    required
+                    placeholder="Enter your restricted Gemini API key"
                 />
-                 <p className="mt-2 text-xs text-gray-500">Required for book identification.</p>
             </div>
             
             <div className="border-t border-gray-700 my-6"></div>
@@ -58,7 +58,7 @@ const Settings: React.FC<SettingsProps> = ({ initialSettings, onSave }) => {
             <div>
                 <h2 className="text-lg font-semibold text-gray-200">Supabase (Optional)</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                    Provide these details if you want to upload your book library to a Supabase Storage bucket.
+                    Provide these details if you want to upload your book library to a Supabase Storage bucket. This enables the "My Library" feature.
                 </p>
             </div>
 
@@ -93,9 +93,8 @@ const Settings: React.FC<SettingsProps> = ({ initialSettings, onSave }) => {
             <div className="flex justify-end gap-4 pt-4">
                 <ActionButton 
                     onClick={handleSave} 
-                    text={isInitialSetup ? "Save and Continue" : "Save Settings"} 
+                    text={"Save Settings"} 
                     primary={true} 
-                    disabled={!apiKey.trim()} 
                 />
             </div>
         </div>
