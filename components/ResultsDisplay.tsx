@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Book, AppSettings } from '../types';
 import ActionButton from './ActionButton';
@@ -22,10 +23,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState('');
   const [newCollectionName, setNewCollectionName] = useState('');
-
+  
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [saveMessage, setSaveMessage] = useState<string>('');
-
+  
   const handleDownload = () => {
     const csvData = convertToCSV(books);
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
@@ -154,7 +155,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
           <p className="font-bold">Success!</p>
           <p className="text-sm">Successfully identified and processed {books.length} book(s).</p>
         </div>
-
+        
         <div className="overflow-x-auto bg-gray-900/60 rounded-lg border border-gray-700">
           <table className="min-w-full text-sm text-left text-gray-300">
             <thead className="text-xs text-gray-200 uppercase bg-gray-700/50">
@@ -163,6 +164,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
                 <th scope="col" className="px-6 py-3">Author</th>
                 <th scope="col" className="px-6 py-3">First Published</th>
                 <th scope="col" className="px-6 py-3">Genre</th>
+                <th scope="col" className="px-6 py-3">Description</th>
               </tr>
             </thead>
             <tbody>
@@ -172,12 +174,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
                   <td className="px-6 py-4">{book.author}</td>
                   <td className="px-6 py-4">{book.publicationYear}</td>
                   <td className="px-6 py-4">{book.genre}</td>
+                  <td className="px-6 py-4 text-gray-400 italic text-xs">{book.description}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
+        
         <div className="mt-6 flex flex-col sm:flex-row gap-4">
           <ActionButton onClick={handleDownload} text="Download CSV" primary={false} />
           {showSupabaseButton && (
@@ -199,7 +202,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
                           <button onClick={() => setSaveMode('new')} className={`px-4 py-2 text-sm rounded-md flex-1 transition ${saveMode === 'new' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>Create New Collection</button>
                           <button onClick={() => setSaveMode('existing')} disabled={collections.length === 0} className={`px-4 py-2 text-sm rounded-md flex-1 transition ${saveMode === 'existing' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'}`}>Add to Existing</button>
                       </div>
-
+                      
                       {saveMode === 'new' ? (
                           <div>
                               <label htmlFor="collectionName" className="block text-sm font-medium text-gray-300 mb-1">New Collection Name</label>
@@ -227,7 +230,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ imageSrc, books, onRese
                       </div>
                   </div>
               )}
-
+              
               {saveStatus !== 'idle' && (
                   <div className={`mt-4 px-4 py-3 rounded-md text-sm text-center transition-all duration-300
                     ${saveStatus === 'success' ? 'bg-green-900/50 border border-green-700 text-green-300' : ''}
