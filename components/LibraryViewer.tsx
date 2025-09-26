@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AppSettings, Book } from '../types';
 import { listFilesFromLibrary, downloadFileContent, deleteFileFromLibrary, uploadCsvToSupabase } from '../services/supabaseService';
@@ -19,19 +20,20 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
     const [isViewAllActive, setIsViewAllActive] = useState<boolean>(false);
     const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
     const [bookCounts, setBookCounts] = useState<Record<string, number | null>>({});
-
+    
     // State for editing functionality
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [saveState, setSaveState] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
     const [saveMessage, setSaveMessage] = useState<string>('');
-
+    
     const totalBooks = useMemo(() => {
         if (files.length === 0 || Object.keys(bookCounts).length < files.length) {
             return null;
         }
-        return Object.values(bookCounts).reduce((sum, count) => sum + (count || 0), 0);
+        // FIX: Add explicit types to the `reduce` parameters to resolve a TypeScript inference issue.
+        return Object.values(bookCounts).reduce((sum: number, count: number | null) => sum + (count || 0), 0);
     }, [bookCounts, files]);
-
+    
     const loadFiles = useCallback(async () => {
         if (!settings?.supabaseUrl || !settings?.supabaseKey) {
             setError("Supabase credentials are not configured.");
@@ -103,7 +105,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
 
             const allBooksArrays = await Promise.all(allBookPromises);
             const combinedBooks = allBooksArrays.flat();
-
+            
             setBooks(combinedBooks);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
@@ -161,7 +163,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
             }
         }
     };
-
+    
     const handleRefresh = () => {
         setSelectedFile(null);
         setBooks([]);
@@ -184,7 +186,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
     };
 
     const handleAddBook = () => {
-        setBooks([...books, { title: '', author: '', publicationYear: '', genre: '' }]);
+        setBooks([...books, { title: '', author: '', publicationYear: '', genre: '', description: '' }]);
     };
 
     const handleCancelEdit = () => {
@@ -198,22 +200,22 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
 
     const handleSaveChanges = async () => {
         if (!selectedFile || !settings?.supabaseUrl || !settings?.supabaseKey) return;
-
+        
         setSaveState('saving');
         setSaveMessage('Saving changes...');
-
+        
         try {
             const csvData = convertToCSV(books);
             await uploadCsvToSupabase(csvData, selectedFile.name, settings.supabaseUrl, settings.supabaseKey);
             setSaveState('success');
             setSaveMessage('Collection updated successfully!');
             setBookCounts(prev => ({...prev, [selectedFile.name]: books.length}));
-
+            
             setTimeout(() => {
                 setIsEditMode(false);
                 setSaveState('idle');
             }, 2000);
-
+            
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
             setSaveState('error');
@@ -235,7 +237,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
             </div>
         );
     }
-
+    
     const renderTable = () => {
         if (isEditMode) {
             return (
@@ -261,13 +263,14 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
                                     <th scope="col" className="px-6 py-3">Author</th>
                                     <th scope="col" className="px-6 py-3">Published</th>
                                     <th scope="col" className="px-6 py-3">Genre</th>
+                                    <th scope="col" className="px-6 py-3">Description</th>
                                     <th scope="col" className="px-1 py-3 text-center">Del</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {books.map((book, index) => (
                                     <tr key={index} className="border-b border-gray-700">
-                                        {[ 'title', 'author', 'publicationYear', 'genre' ].map((field) => (
+                                        {[ 'title', 'author', 'publicationYear', 'genre', 'description' ].map((field) => (
                                             <td key={field} className="px-2 py-1 sm:px-6 sm:py-2">
                                                 <input
                                                     type="text"
@@ -301,6 +304,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
                             <th scope="col" className="px-6 py-3">Author</th>
                             <th scope="col" className="px-6 py-3">First Published</th>
                             <th scope="col" className="px-6 py-3">Genre</th>
+                            <th scope="col" className="px-6 py-3">Description</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -310,6 +314,7 @@ const LibraryViewer: React.FC<LibraryViewerProps> = ({ settings }) => {
                                 <td className="px-6 py-4">{book.author}</td>
                                 <td className="px-6 py-4">{book.publicationYear}</td>
                                 <td className="px-6 py-4">{book.genre}</td>
+                                <td className="px-6 py-4 text-gray-400 italic text-xs">{book.description}</td>
                             </tr>
                         ))}
                     </tbody>
