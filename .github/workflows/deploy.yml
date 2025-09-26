@@ -1,32 +1,32 @@
-name: Build and Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]  # Adjust to your branch
 
 jobs:
-  build-deploy:
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Publish to Cloudflare Pages
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      # Add your build step if needed (e.g., for a static site)
+      # - name: Build
+      #   run: npm ci && npm run build
+      #   env:
+      #     NODE_VERSION: 18
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build app
-        run: npm run build
-
-      - name: Deploy to Cloudflare Pages
+      - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: your-project-name
-          directory: dist
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}  # Ensure this secret is set
+          accountId: af0faebfb1b3ae4956ecdd9927fa1f87  # Your provided Account ID
+          projectName: your-project-name  # Replace with your Cloudflare Pages project name
+          directory: .  # Replace with your build output directory, e.g., dist/ or build/
+          # gitHubToken: ${{ secrets.GITHUB_TOKEN }}  # Optional for GitHub integration
+          # branch: main  # Optional for branch-specific deployments
