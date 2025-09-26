@@ -24,7 +24,7 @@ jobs:
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}  # Ensure this secret is set
+          apiToken: ${{ secrets.CF_API_TOKEN }}  # Ensure this secret is set
           accountId: af0faebfb1b3ae4956ecdd9927fa1f87  # Your provided Account ID
           projectName: your-project-name  # Replace with your Cloudflare Pages project name
           directory: .  # Replace with your build output directory, e.g., dist/ or build/
