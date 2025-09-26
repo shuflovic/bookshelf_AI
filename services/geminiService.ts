@@ -16,9 +16,12 @@ const bookSchema = {
   required: ['title', 'author', 'publicationYear', 'authorGenre', 'description']
 };
 
-export const identifyBooksFromImage = async (base64Image: string, mimeType: string): Promise<Book[]> => {
-  // FIX: Per Gemini API guidelines, API key must be read from process.env.API_KEY.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const identifyBooksFromImage = async (apiKey: string, base64Image: string, mimeType: string): Promise<Book[]> => {
+  if (!apiKey) {
+    throw new Error("Gemini API key is not configured. Please add it in the settings.");
+  }
+  
+  const ai = new GoogleGenAI({ apiKey });
   const model = 'gemini-2.5-flash';
   
   const textPart = {
@@ -69,6 +72,6 @@ export const identifyBooksFromImage = async (base64Image: string, mimeType: stri
 
   } catch (error) {
     console.error("Gemini API call failed:", error);
-    throw new Error("Failed to get a valid response from the AI model. Ensure the Gemini API key is configured correctly in your environment.");
+    throw new Error("Failed to get a valid response from the AI model. Please check if your Gemini API key is correct and has been entered in the settings.");
   }
 };
