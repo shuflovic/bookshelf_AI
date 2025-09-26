@@ -26,7 +26,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}  # Ensure this secret is set
           accountId: af0faebfb1b3ae4956ecdd9927fa1f87  # Your provided Account ID
-          projectName: your-project-name  # Replace with your Cloudflare Pages project name
+          projectName: bookshelf-ai  # Replace with your Cloudflare Pages project name
           directory: .  # Replace with your build output directory, e.g., dist/ or build/
           # gitHubToken: ${{ secrets.GITHUB_TOKEN }}  # Optional for GitHub integration
           # branch: main  # Optional for branch-specific deployments
