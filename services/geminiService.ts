@@ -10,16 +10,15 @@ const bookSchema = {
     publicationYear: {
       type: Type.STRING
     },
-    authorGenre: { type: Type.STRING }
+    authorGenre: { type: Type.STRING },
+    description: { type: Type.STRING }
   },
-  required: ['title', 'author', 'publicationYear', 'authorGenre']
+  required: ['title', 'author', 'publicationYear', 'authorGenre', 'description']
 };
 
-export const identifyBooksFromImage = async (base64Image: string, mimeType: string, apiKey: string): Promise<Book[]> => {
-  if (!apiKey) {
-    throw new Error("API_KEY is not provided.");
-  }
-  const ai = new GoogleGenAI({ apiKey });
+export const identifyBooksFromImage = async (base64Image: string, mimeType: string): Promise<Book[]> => {
+  // FIX: Per Gemini API guidelines, API key must be read from process.env.API_KEY.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = 'gemini-2.5-flash';
   
   const textPart = {
@@ -29,6 +28,7 @@ export const identifyBooksFromImage = async (base64Image: string, mimeType: stri
       2. The full name of the author.
       3. The year the book was FIRST published.
       4. The primary literary genre of the book (e.g., Fiction, Sci-Fi, History).
+      5. A concise, one-sentence description of the book's content or plot.
 
       If any piece of information cannot be determined, use the string "Unknown". Return the data for all identified books in the specified JSON format.
     `
@@ -61,13 +61,14 @@ export const identifyBooksFromImage = async (base64Image: string, mimeType: stri
       title: book.title,
       author: book.author,
       publicationYear: book.publicationYear,
-      genre: book.authorGenre
+      genre: book.authorGenre,
+      description: book.description
     }));
     
     return books;
 
   } catch (error) {
     console.error("Gemini API call failed:", error);
-    throw new Error("Failed to get a valid response from the AI model. Check your API Key.");
+    throw new Error("Failed to get a valid response from the AI model. Ensure the Gemini API key is configured correctly in your environment.");
   }
 };
