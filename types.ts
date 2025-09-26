@@ -4,6 +4,7 @@ export interface Book {
   author: string;
   publicationYear: number | string;
   genre: string;
+  description: string;
 }
 
 export interface GeminiBookResponse {
@@ -11,6 +12,7 @@ export interface GeminiBookResponse {
     author: string;
     publicationYear: number | string;
     authorGenre: string;
+    description: string;
 }
 
 export enum UploadState {
@@ -22,7 +24,6 @@ export enum UploadState {
 }
 
 export interface AppSettings {
-  apiKey?: string;
   supabaseUrl?: string;
   supabaseKey?: string;
 }
