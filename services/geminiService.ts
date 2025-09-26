@@ -10,10 +10,10 @@ const bookSchema = {
     publicationYear: {
       type: Type.STRING
     },
-    authorGenre: { type: Type.STRING },
+    genre: { type: Type.STRING },
     description: { type: Type.STRING }
   },
-  required: ['title', 'author', 'publicationYear', 'authorGenre', 'description']
+  required: ['title', 'author', 'publicationYear', 'genre', 'description']
 };
 
 export const identifyBooksFromImage = async (apiKey: string, base64Image: string, mimeType: string): Promise<Book[]> => {
@@ -64,7 +64,7 @@ export const identifyBooksFromImage = async (apiKey: string, base64Image: string
       title: book.title,
       author: book.author,
       publicationYear: book.publicationYear,
-      genre: book.authorGenre,
+      genre: book.genre,
       description: book.description
     }));
     
