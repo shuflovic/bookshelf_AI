@@ -39,10 +39,9 @@ const App: React.FC = () => {
     localStorage.setItem('appSettings', JSON.stringify(newSettings));
     setSettings(newSettings);
     
+    // Only navigate away automatically on the first mandatory setup.
     if (forceSettingsView && newSettings.apiKey) {
         setForceSettingsView(false);
-        setCurrentView('upload');
-    } else if (currentView === 'settings') {
         setCurrentView('upload');
     }
   };
