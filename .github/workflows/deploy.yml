@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci  # use `npm install` if you don't commit package-lock.json
 
       - name: Build
         run: npm run build
@@ -28,5 +28,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          # If your repo is not 'username.github.io', this is required:
-          # Set 'base' in vite.config.ts to "/bookshelf_AI/"
