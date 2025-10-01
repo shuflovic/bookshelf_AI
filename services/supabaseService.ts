@@ -1,12 +1,36 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export const uploadCsvToSupabase = async (csvData: string, fileName: string, supabaseUrl: string, supabaseKey: string): Promise<void> => {
+// Module-level cache for the Supabase client
+let supabaseInstance: SupabaseClient | null = null;
+let lastSupabaseUrl: string | null = null;
+let lastSupabaseKey: string | null = null;
+
+/**
+ * Gets a Supabase client instance.
+ * It creates a new instance if the URL or key has changed, otherwise returns the cached instance.
+ * This prevents re-creating the client on every single function call.
+ */
+const getSupabaseClient = (supabaseUrl: string, supabaseKey: string): SupabaseClient => {
+  if (supabaseInstance && lastSupabaseUrl === supabaseUrl && lastSupabaseKey === supabaseKey) {
+    return supabaseInstance;
+  }
+
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Supabase URL or Key not provided.");
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-t;' });
+  // Credentials have changed or client doesn't exist, create a new one.
+  lastSupabaseUrl = supabaseUrl;
+  lastSupabaseKey = supabaseKey;
+  supabaseInstance = createClient(supabaseUrl, supabaseKey);
+  
+  return supabaseInstance;
+};
+
+
+export const uploadCsvToSupabase = async (csvData: string, fileName: string, supabaseUrl: string, supabaseKey: string): Promise<void> => {
+  const supabase = getSupabaseClient(supabaseUrl, supabaseKey);
+  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   const bucketName = 'library';
 
   // Use upsert to create the file if it doesn't exist, or overwrite it if it does.
@@ -29,7 +53,7 @@ export const uploadCsvToSupabase = async (csvData: string, fileName: string, sup
 
 
 export const listFilesFromLibrary = async (supabaseUrl: string, supabaseKey: string) => {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = getSupabaseClient(supabaseUrl, supabaseKey);
     const { data, error } = await supabase.storage.from('library').list('', {
         sortBy: { column: 'created_at', order: 'desc' },
     });
@@ -42,7 +66,7 @@ export const listFilesFromLibrary = async (supabaseUrl: string, supabaseKey: str
 };
 
 export const downloadFileContent = async (fileName: string, supabaseUrl: string, supabaseKey: string) => {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = getSupabaseClient(supabaseUrl, supabaseKey);
     const { data, error } = await supabase.storage.from('library').download(fileName);
     if (error) {
         console.error("Error downloading file:", error);
@@ -53,7 +77,7 @@ export const downloadFileContent = async (fileName: string, supabaseUrl: string,
 
 
 export const deleteFileFromLibrary = async (fileName: string, supabaseUrl: string, supabaseKey: string) => {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = getSupabaseClient(supabaseUrl, supabaseKey);
     const { error } = await supabase.storage.from('library').remove([fileName]);
     if (error) {
         console.error("Error deleting file:", error);
